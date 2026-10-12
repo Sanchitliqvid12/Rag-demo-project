@@ -8,7 +8,6 @@ from ebooklib import epub
 from pptx import Presentation
 from pypdf import PdfReader
 
-
 def read_pdf(data):
     for i, page in enumerate(PdfReader(io.BytesIO(data)).pages, start=1):
         yield f"Page {i}", page.extract_text() or ""

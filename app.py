@@ -11,7 +11,8 @@ from readers import READERS, read_file
 load_dotenv()
 
 PROMPT = """ You are a helpful assistant. Answer the question using only the context below and try to give a detailed response.
-If the answer is not in the context, say you could not find it in the document.
+If the answer is not in the context or if you are unsure, say you could not find it in the document.
+If you are not able to answer the question, try to analyze the question and provide a detailed response based on your understanding but don't hallucinate anything randomly and re-asure that answer you are going to give match the question requirements.
 Don't make up an answer.
 Don't include any information that is not in the context.
 Don't hallucinate or fabricate information.
@@ -29,6 +30,7 @@ def build_vectorstore(name, data):
         raise ValueError("no readable text found (scanned PDF or image?)")
     docs = [Document(page_content=text, metadata={"location": location}) for location, text in sections]
     chunks = RecursiveCharacterTextSplitter(chunk_size=700, chunk_overlap=100).split_documents(docs)
+    st.write(f"Total Chunks: {len(chunks)}")
     return Chroma.from_documents(
         chunks,
         OpenAIEmbeddings(model="text-embedding-3-small"),
@@ -90,7 +92,7 @@ if question := st.chat_input("Ask something about your file...", disabled=not ve
             with st.spinner("Thinking..."):
                 docs = vectorstore.similarity_search(question, k=5)
                 context = "\n\n".join(doc.page_content for doc in docs)
-                llm = ChatOpenAI(model="gpt-4o-mini", temperature=1)
+                llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
                 answer = llm.invoke(PROMPT.format(context=context, question=question)).content
         except Exception as error:
             st.error(f"Could not get an answer: {error}")
