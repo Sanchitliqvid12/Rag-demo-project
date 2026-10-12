@@ -1,0 +1,12 @@
+streamlit
+langchain-openai
+langchain-chroma
+langchain-text-splitters
+python-dotenv
+pypdf
+EbookLib
+beautifulsoup4
+langchain-core
+python-docx
+pandas
+python-pptx
